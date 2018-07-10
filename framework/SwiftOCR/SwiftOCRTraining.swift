@@ -144,6 +144,7 @@ open class SwiftOCRTraining {
             }
         #endif
 
+        var saveIndex: Int = 0
         
         for _ in 0..<size {
 
@@ -187,6 +188,17 @@ open class SwiftOCRTraining {
                 for blobIndex in 0..<blobs.count {
                     
                     let blob = blobs[blobIndex]
+                    let image: NSImage = blob.0
+                    
+                    let index = code.index(code.startIndex, offsetBy: blobIndex)
+                    let char = code[index]
+                    
+                    
+                    let fileName = "\(char)_\(saveIndex)"
+                    
+                    generateImageForSaving(image: image, fileName: fileName)
+                    
+                    saveIndex += 1
                     
                     let imageData = ocrInstance.convertImageToFloatArray(blob.0)
                     
@@ -204,6 +216,59 @@ open class SwiftOCRTraining {
         }
         
         return trainingSet
+    }
+    
+    private func generateImageForSaving(image: NSImage, fileName: String) {
+        let size = image.size
+        let maximumDimension: CGFloat = 20.0 // 2 point padding
+        
+        var minimumDimension: CGFloat = 20.0
+        var scaledSize: CGSize = CGSize(width: maximumDimension, height: maximumDimension)
+        
+        if size.width > size.height {
+            minimumDimension = (maximumDimension * size.height / size.width)
+            scaledSize = CGSize(width: maximumDimension, height: minimumDimension)
+        } else {
+            minimumDimension = (maximumDimension * size.width / size.height)
+            scaledSize = CGSize(width: minimumDimension, height: maximumDimension)
+        }
+        
+        let resizedImage = image.resizeImage(width: scaledSize.width, scaledSize.height)
+        let paddingImage = resizedImage.addPadding(2, withColor: NSColor.white)
+        
+        saveImage(image: paddingImage,
+                  name: fileName)
+    }
+    
+    private func saveImage(image: NSImage,
+                           name: String) {
+        guard let documentURL = FileManager.default.urls(
+            for: .documentDirectory,
+            in: .userDomainMask).first else {
+                return
+        }
+        
+        let fileName = "\(name).png"
+        
+        let folderURL = documentURL.appendingPathComponent("FilamentDataset")
+        if !FileManager.default.fileExists(atPath: folderURL.path) {
+            do {
+                try FileManager.default.createDirectory(
+                    at: folderURL,
+                    withIntermediateDirectories: false,
+                    attributes: nil)
+            } catch  {
+                print("cannot create directory - folder Exists?")
+            }
+        }
+        
+        let url = folderURL.appendingPathComponent(fileName)
+        do {
+            try image.savePngTo(url: url)
+        }
+        catch {
+            print("error saving file")
+        }
     }
     
     /**

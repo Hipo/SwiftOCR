@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1704ABF120F5294400DFD6ED /* NSImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1704ABF020F5294400DFD6ED /* NSImage.swift */; };
 		372578D01CDA07D900785B68 /* GPUImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37CA6E491CD8D97C00562F20 /* GPUImage.framework */; };
 		372578D11CDA07D900785B68 /* GPUImage.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 37CA6E491CD8D97C00562F20 /* GPUImage.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		37711D8E1CD78CB700DC6B43 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37711D8D1CD78CB700DC6B43 /* AppDelegate.swift */; };
@@ -80,6 +81,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1704ABF020F5294400DFD6ED /* NSImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSImage.swift; sourceTree = "<group>"; };
 		37711D8A1CD78CB700DC6B43 /* SwiftOCR Training.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SwiftOCR Training.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		37711D8D1CD78CB700DC6B43 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		37711D8F1CD78CB700DC6B43 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -148,6 +150,7 @@
 				37711D911CD78CB700DC6B43 /* Assets.xcassets */,
 				37711D931CD78CB700DC6B43 /* Main.storyboard */,
 				37711D961CD78CB700DC6B43 /* Info.plist */,
+				1704ABF020F5294400DFD6ED /* NSImage.swift */,
 			);
 			path = "SwiftOCR Training";
 			sourceTree = "<group>";
@@ -347,6 +350,7 @@
 				37711DB71CD7A84D00DC6B43 /* ButtonTableCellView.swift in Sources */,
 				37CCABE61CD8D03600ECA264 /* FFNN.swift in Sources */,
 				37CCABEC1CD8D03600ECA264 /* CrossPlatformSupport.swift in Sources */,
+				1704ABF120F5294400DFD6ED /* NSImage.swift in Sources */,
 				37CCABEB1CD8D03600ECA264 /* Vector.swift in Sources */,
 				37CCABE51CD8D03600ECA264 /* FFNN+Storage.swift in Sources */,
 				37CCABED1CD8D03600ECA264 /* Extensions.swift in Sources */,
