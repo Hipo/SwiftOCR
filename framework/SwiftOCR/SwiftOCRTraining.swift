@@ -234,9 +234,12 @@ open class SwiftOCRTraining {
         }
         
         let resizedImage = image.resizeImage(width: scaledSize.width, scaledSize.height)
-        let paddingImage = resizedImage.addPadding(2, withColor: NSColor.white)
+        let paddingImage = resizedImage.addPadding(4, withColor: NSColor.white)
         
-        saveImage(image: paddingImage,
+        let resizedIconImage = paddingImage.resizeImage(width: paddingImage.size.width / 2,
+                                                        paddingImage.size.height / 2)
+        
+        saveImage(image: resizedIconImage,
                   name: fileName)
     }
     
