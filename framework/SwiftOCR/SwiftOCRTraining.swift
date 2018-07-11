@@ -85,7 +85,29 @@ open class SwiftOCRTraining {
         }
         
         let randomFont: () -> OCRFont = {
-            return OCRFont(name: randomFontName(), size: 45 + randomFloat(5))!
+            let fontDescriptorWithNoFeatures = CTFontDescriptorCreateWithNameAndSize(
+                randomFontName() as CFString, 45 + randomFloat(5))
+            
+            let defaultAllocator: CFAllocator = CFAllocatorGetDefault().takeRetainedValue()
+            
+            var numberSpacing = kNumberSpacingType
+            var numberSpacingType = kMonospacedNumbersSelector
+            
+            let numberSpacingId = CFNumberCreate(defaultAllocator, CFNumberType.intType, &numberSpacing)
+            let monospacedNumbersSelector = CFNumberCreate(defaultAllocator,
+                                                           CFNumberType.intType,
+                                                           &numberSpacingType)
+            
+            let fontDescriptor = CTFontDescriptorCreateCopyWithFeature(
+                fontDescriptorWithNoFeatures,
+                numberSpacingId!,
+                monospacedNumbersSelector!)
+            
+            let font = CTFontCreateWithFontDescriptor(fontDescriptor,
+                                                      45 + randomFloat(5),
+                                                      nil) as OCRFont
+            
+            return font
         }
     
         let randomFontAttributes: () -> [NSAttributedStringKey: Any] = {
