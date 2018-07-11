@@ -83,9 +83,10 @@ open class SwiftOCRTraining {
         //Font
         
         let randomFontName: () -> String = {
-            let randomDouble = Double(arc4random())/(Double(UINT32_MAX) + 1)
-            let randomIndex  = Int(floor(randomDouble * Double(self.trainingFontNames.count)))
-            return self.trainingFontNames[randomIndex]
+            return "LexiconNo1-RomanA"
+//            let randomDouble = Double(arc4random())/(Double(UINT32_MAX) + 1)
+//            let randomIndex  = Int(floor(randomDouble * Double(self.trainingFontNames.count)))
+//            return self.trainingFontNames[randomIndex]
         }
         
         let randomFont: () -> OCRFont = {
@@ -94,8 +95,8 @@ open class SwiftOCRTraining {
             
             let defaultAllocator: CFAllocator = CFAllocatorGetDefault().takeRetainedValue()
             
-            var numberSpacing = kNumberSpacingType
-            var numberSpacingType = kMonospacedNumbersSelector
+            var numberSpacing = 17
+            var numberSpacingType = 2
             
             let numberSpacingId = CFNumberCreate(defaultAllocator, CFNumberType.intType, &numberSpacing)
             let monospacedNumbersSelector = CFNumberCreate(defaultAllocator,
@@ -107,7 +108,20 @@ open class SwiftOCRTraining {
                 numberSpacingId!,
                 monospacedNumbersSelector!)
             
-            let font = CTFontCreateWithFontDescriptor(fontDescriptor,
+            var numberCase = 21
+            var numberCaseType = 1
+            
+            let numberCaseId = CFNumberCreate(defaultAllocator, CFNumberType.intType, &numberCase)
+            let liningNumberCaseSelector = CFNumberCreate(defaultAllocator,
+                                                          CFNumberType.intType,
+                                                          &numberCaseType)
+            
+            let finalFontDescriptor = CTFontDescriptorCreateCopyWithFeature(
+                fontDescriptor,
+                numberCaseId!,
+                liningNumberCaseSelector!)
+            
+            let font = CTFontCreateWithFontDescriptor(finalFontDescriptor,
                                                       45 + randomFloat(5),
                                                       nil) as OCRFont
             
@@ -177,28 +191,28 @@ open class SwiftOCRTraining {
         //Distort Numbers Image
         let numbersTransformImage  = GPUImagePicture(image: numbersImage)
         let numbersTransformFilter = GPUImageTransformFilter()
-        
-        var numbersAffineTransform = CGAffineTransform()
-        
-        numbersAffineTransform.a  = 1.05 + (       CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.1 )
-        numbersAffineTransform.b  = 0    + (0.01 - CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.02)
-        numbersAffineTransform.c  = 0    + (0.03 - CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.06)
-        numbersAffineTransform.d  = 1.05 + (       CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.1 )
-        
-        numbersTransformFilter.affineTransform = numbersAffineTransform
+
+//        var numbersAffineTransform = CGAffineTransform()
+//
+//        numbersAffineTransform.a  = 1.05 + (       CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.1 )
+//        numbersAffineTransform.b  = 0    + (0.01 - CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.02)
+//        numbersAffineTransform.c  = 0    + (0.03 - CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.06)
+//        numbersAffineTransform.d  = 1.05 + (       CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.1 )
+//
+//        numbersTransformFilter.affineTransform = numbersAffineTransform
         numbersTransformImage?.addTarget(numbersTransformFilter)
-        
+
         numbersTransformFilter.useNextFrameForImageCapture()
         numbersTransformImage?.processImage()
-        
+
         var numbersTransformedImage:OCRImage? = numbersTransformFilter.imageFromCurrentFramebuffer(with: .up)
-        
+
         while numbersTransformedImage == nil || numbersTransformedImage?.size == CGSize.zero {
             numbersTransformFilter.useNextFrameForImageCapture()
             numbersTransformImage?.processImage()
             numbersTransformedImage = numbersTransformFilter.imageFromCurrentFramebuffer(with: .up)
         }
-        
+
         let numbersDistortedImage: NSImage = ocrInstance.preprocessImageForOCR(numbersTransformedImage!)
         
         saveImage(image: numbersDistortedImage, name: "chars")
@@ -207,69 +221,69 @@ open class SwiftOCRTraining {
 
             let code               = randomCode()
             let currentCustomImage = customImage(code)
-            
+
             //Distort Image
-            
+
             let transformImage  = GPUImagePicture(image: currentCustomImage)
             let transformFilter = GPUImageTransformFilter()
-            
+
             var affineTransform = CGAffineTransform()
-            
+
             affineTransform.a  = 1.05 + (       CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.1 )
             affineTransform.b  = 0    + (0.01 - CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.02)
             affineTransform.c  = 0    + (0.03 - CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.06)
             affineTransform.d  = 1.05 + (       CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.1 )
-            
+
             transformFilter.affineTransform = affineTransform
             transformImage?.addTarget(transformFilter)
-            
+
             transformFilter.useNextFrameForImageCapture()
             transformImage?.processImage()
-            
+
             var transformedImage:OCRImage? = transformFilter.imageFromCurrentFramebuffer(with: .up)
-            
+
             while transformedImage == nil || transformedImage?.size == CGSize.zero {
                 transformFilter.useNextFrameForImageCapture()
                 transformImage?.processImage()
                 transformedImage = transformFilter.imageFromCurrentFramebuffer(with: .up)
             }
-            
+
             let distortedImage = ocrInstance.preprocessImageForOCR(transformedImage!)
-            
+
             //Generate Training set
-            
+
             let blobs = ocrInstance.extractBlobs(distortedImage)
-            
+
             if blobs.count == 6 {
-                
+
                 for blobIndex in 0..<blobs.count {
-                    
+
                     let blob = blobs[blobIndex]
                     let image: NSImage = blob.0
-                    
+
                     let index = code.index(code.startIndex, offsetBy: blobIndex)
                     let char = code[index]
-                    
-                    
+
+
                     let fileName = "\(char)_\(saveIndex)"
-                    
+
                     generateImageForSaving(image: image, fileName: fileName)
-                    
+
                     saveIndex += 1
-                    
+
                     let imageData = ocrInstance.convertImageToFloatArray(blob.0)
-                    
+
                     var imageAnswer = [Float](repeating: 0, count: recognizableCharacters.characters.count)
                     if let index = Array(recognizableCharacters.characters).index(of: Array(code.characters)[blobIndex]) {
                         imageAnswer[index] = 1
                     }
-                    
+
                     trainingSet.append((imageData,imageAnswer))
                 }
-                
+
             }
-            
-            
+
+
         }
         
         return trainingSet
