@@ -72,6 +72,10 @@ open class SwiftOCRTraining {
             return code
         }
         
+        let numbers: () -> String = {
+            return "1234567890"
+        }
+        
         let randomFloat: (CGFloat) -> CGFloat = { modi in
             return  (0 - modi) + CGFloat(arc4random()) / CGFloat(UINT32_MAX) * (modi * 2)
         }
@@ -167,6 +171,37 @@ open class SwiftOCRTraining {
         #endif
 
         var saveIndex: Int = 0
+        
+        let numbersImage = customImage(numbers())
+        
+        //Distort Numbers Image
+        let numbersTransformImage  = GPUImagePicture(image: numbersImage)
+        let numbersTransformFilter = GPUImageTransformFilter()
+        
+        var numbersAffineTransform = CGAffineTransform()
+        
+        numbersAffineTransform.a  = 1.05 + (       CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.1 )
+        numbersAffineTransform.b  = 0    + (0.01 - CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.02)
+        numbersAffineTransform.c  = 0    + (0.03 - CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.06)
+        numbersAffineTransform.d  = 1.05 + (       CGFloat(arc4random())/CGFloat(UINT32_MAX) * 0.1 )
+        
+        numbersTransformFilter.affineTransform = numbersAffineTransform
+        numbersTransformImage?.addTarget(numbersTransformFilter)
+        
+        numbersTransformFilter.useNextFrameForImageCapture()
+        numbersTransformImage?.processImage()
+        
+        var numbersTransformedImage:OCRImage? = numbersTransformFilter.imageFromCurrentFramebuffer(with: .up)
+        
+        while numbersTransformedImage == nil || numbersTransformedImage?.size == CGSize.zero {
+            numbersTransformFilter.useNextFrameForImageCapture()
+            numbersTransformImage?.processImage()
+            numbersTransformedImage = numbersTransformFilter.imageFromCurrentFramebuffer(with: .up)
+        }
+        
+        let numbersDistortedImage: NSImage = ocrInstance.preprocessImageForOCR(numbersTransformedImage!)
+        
+        saveImage(image: numbersDistortedImage, name: "chars")
         
         for _ in 0..<size {
 
