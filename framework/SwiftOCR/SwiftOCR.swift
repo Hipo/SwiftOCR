@@ -547,7 +547,7 @@ open class SwiftOCR {
             let blurFilter      = GPUImageBoxBlurFilter()
             let opacityFilter   = GPUImageOpacityFilter()
             
-            blurFilter.blurRadiusInPixels = 9
+            blurFilter.blurRadiusInPixels = 80
             opacityFilter.opacity         = 0.93
             
             image?       .addTarget(grayFilter)
