@@ -71,11 +71,7 @@ open class SwiftOCRTraining {
             
             return code
         }
-        
-        let randomFloat: (CGFloat) -> CGFloat = { modi in
-            return  (0 - modi) + CGFloat(arc4random()) / CGFloat(UINT32_MAX) * (modi * 2)
-        }
-        
+                
         //Font
         
         let randomFontName: () -> String = {
@@ -85,7 +81,7 @@ open class SwiftOCRTraining {
         }
         
         let randomFont: () -> OCRFont = {
-            return OCRFont(name: randomFontName(), size: 45 + randomFloat(5))!
+            return OCRFont(name: randomFontName(), size: 45 + self.randomFloat(5))!
         }
     
         let randomFontAttributes: () -> [NSAttributedString.Key: Any] = {
@@ -95,7 +91,7 @@ open class SwiftOCRTraining {
             
             return [.font: randomFont(),
                     .kern: CGFloat(8) as NSObject,
-                    .foregroundColor: OCRColor(red: 27/255 + randomFloat(0.2), green: 16/255 + randomFloat(0.2), blue: 16/255 + randomFloat(0.2), alpha: 80/100 + randomFloat(0.2)),
+                    .foregroundColor: OCRColor(red: 27/255 + self.randomFloat(0.2), green: 16/255 + self.randomFloat(0.2), blue: 16/255 + self.randomFloat(0.2), alpha: 80/100 + self.randomFloat(0.2)),
                     .paragraphStyle: paragraphStyle]
         }
         
@@ -122,7 +118,7 @@ open class SwiftOCRTraining {
                 UIGraphicsBeginImageContext(randomImg.size)
                 randomImg.draw(in: CGRect(origin: CGPoint.zero, size: randomImg.size))
                 
-                NSString(string: code).draw(in: CGRect(origin: CGPoint(x: 0 + randomFloat(5), y: -15.5 + randomFloat(5)), size: randomImg.size), withAttributes: randomFontAttributes())
+                NSString(string: code).draw(in: CGRect(origin: CGPoint(x: 0 + self.randomFloat(5), y: -15.5 + self.randomFloat(5)), size: randomImg.size), withAttributes: randomFontAttributes())
                 
                 let customImage = UIGraphicsGetImageFromCurrentImageContext()
                 UIGraphicsEndImageContext()
@@ -217,11 +213,7 @@ open class SwiftOCRTraining {
     fileprivate func generateCharSetFromImages(_ images: [(image: OCRImage, characters: [Character])], withNumberOfDistortions distortions: Int) -> [([Float],[Float])] {
         
         var trainingSet = [([Float],[Float])]()
-        
-        let randomFloat: (CGFloat) -> CGFloat = { modi in
-            return  (0 - modi) + CGFloat(arc4random()) / CGFloat(UINT32_MAX) * (modi * 2)
-        }
-        
+                
         for (image, characters) in images {
             
             var imagesToExtractBlobsFrom = [OCRImage]()
@@ -336,4 +328,14 @@ open class SwiftOCRTraining {
         
     }
     
+}
+
+/**
+ Helper
+*/
+
+extension SwiftOCRTraining {
+    fileprivate func randomFloat(_ modi: CGFloat) -> CGFloat {
+        return (0 - modi) + CGFloat(arc4random()) / CGFloat(UINT32_MAX) * (modi * 2)
+    }
 }
